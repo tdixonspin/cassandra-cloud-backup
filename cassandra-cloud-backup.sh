@@ -279,7 +279,7 @@ function validate() {
         logerror "Cannot parse data_directories from ${YAML_FILE} and --home-dir argument" \
         " is missing, which should be the \$CASSANDRA_HOME path"
       else
-        data_file_directories="${CASS_HOME}/data/data"
+        data_file_directories="${CASS_HOME}/data"
       fi
     fi
     if ${INCLUDE_COMMIT_LOGS}; then
@@ -421,6 +421,9 @@ function validate() {
           fi
       fi
     fi
+  else
+    # ${ACTION} = "inventory"
+    parse_yaml_inventory
   fi
 
   logverbose "ERROR_COUNT: ${ERROR_COUNT}"
@@ -487,7 +490,7 @@ function single_script_check() {
   logverbose "checking that script isn't already running"
   logverbose "grep_script: ${grep_script}"
   status="$(ps -feww | grep -w \"${grep_script}\" \
-    | awk -v pid=$$ '$2 != pid { print $2 }')"
+    | awk -v pid="$(echo $$)" '$2 != pid { print $2 }')"
   if [ ! -z "${status}" ]; then
     logerror " ${SCRIPT_NAME} : Process is already running. Aborting"
     exit 1;
